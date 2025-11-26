@@ -8,6 +8,8 @@ update_parameters() {
     ENABLED=$(echo "$MESSAGE" | jq -r '.enabled // false')
     INTERVAL=$(echo "$MESSAGE" | jq -r '.interval // "weekly"')
 
+    # Add your custom logic here
+
     # create event
     text="Changing auto updater. enabled=$ENABLED, interval=$INTERVAL"
     timestamp=""

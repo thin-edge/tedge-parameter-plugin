@@ -20,6 +20,9 @@ depends:
   - jq
   - tedge-inventory
 
+scripts:
+  postinstall: ./src/packaging/postinstall
+
 apk:
   # Use noarch instead of "all"
   arch: noarch
