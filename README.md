@@ -1,8 +1,8 @@
 # tedge-parameter-plugin
 
-⚠️ This is a work-in-progress so expect things to break
+⚠️ This is a work-in-progress so expect things to break and the Cumulocity feature is still in development
 
-thin-edge.io Cumulocity IoT shell plugin to process the `c8y_Command` operation.
+thin-edge.io plugin to add support for the Cumulocity `c8y_ParameterUpdate` operation.
 
 ## Plugin summary
 
