@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+EXISTING_PAYLOAD=$(tedge mqtt sub te/device/main///twin/AutoUpdater --retained-only --count 1 --duration 2s --no-topic ||:)
+if [ -z "$EXISTING_PAYLOAD" ]; then
+    echo "Setting default values for the AutoUpdater" >&2
+    printf 'enabled=false\n'
+    printf 'interval="weekly"\n'
+fi
