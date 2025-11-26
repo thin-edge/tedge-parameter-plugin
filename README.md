@@ -41,27 +41,27 @@ An additional parameter set plugins should be added in the following script:
 
 1. Add your script to the following folder:
 
-  ```sh
-  /usr/share/tedge/parameter-plugins/
-  ```
+    ```sh
+    /usr/share/tedge/parameter-plugins/
+    ```
 
-  For example, if you want a parameter set called "foo", then the script would be created at the following location:
+    For example, if you want a parameter set called "foo", then the script would be created at the following location:
 
-  ```sh
-  /usr/share/tedge/parameter-plugins/foo
-  ```
+    ```sh
+    /usr/share/tedge/parameter-plugins/foo
+    ```
 
-  The script should also be executable, e.g.
+    The script should also be executable, e.g.
 
-  ```sh
-  chmod +x /usr/share/tedge/parameter-plugins/foo
-  ```
+    ```sh
+    chmod +x /usr/share/tedge/parameter-plugins/foo
+    ```
 
 1. Set the initial state of the parameter set so that the UI will be able to display the current state
 
-  ```sh
-  tedge mqtt pub -r -q 1 te/device/main///twin/foo '{}'
-  ```
+    ```sh
+    tedge mqtt pub -r -q 1 te/device/main///twin/foo '{}'
+    ```
 
 ## Advanced
 
