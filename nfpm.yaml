@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://nfpm.goreleaser.com/static/schema.json
+---
+name: tedge-parameter-plugin
+arch: all
+platform: linux
+version: ${SEMVER}
+section: misc
+priority: optional
+maintainer: Community <community@thin-edge.io>
+description: thin-edge.io parameter plugin to enable usage of the Cumulocity Parameter Set operation
+vendor: thin-edge.io
+homepage: https://github.com/thin-edge/tedge-parameter-plugin
+license: Apache License 2.0
+disable_globbing: false
+
+provides:
+  - tedge-parameter
+
+depends:
+  - jq
+
+apk:
+  # Use noarch instead of "all"
+  arch: noarch
+contents:
+  - src: ./src/parameter_update.toml
+    dst: /etc/tedge/operations/
+    file_info:
+      mode: 0644
+
+  - src: ./src/c8y_ParameterUpdate.template
+    dst: /etc/tedge/operations/c8y/
+    file_info:
+      mode: 0644
+
+  - src: ./src/parameter_update.sh
+    dst: /usr/bin/parameter_update.sh
+    file_info:
+      mode: 0755
+
+  - src: ./src/plugins/*
+    dst: /usr/share/tedge/parameter-plugins/
+    file_info:
+      mode: 0755
