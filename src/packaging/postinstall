@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+if command -v systemctl >/dev/null 2>&1; then
+    echo "Starting tedge-inventory service to run inventory scripts" >&2
+    systemctl start tedge-inventory.service ||:
+fi
