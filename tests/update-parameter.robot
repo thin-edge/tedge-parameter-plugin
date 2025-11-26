@@ -17,13 +17,14 @@ Run Parameter Update handler as a plugin
     Cumulocity.Should Contain Supported Operations    c8y_ParameterUpdate
 
     # Set the initial state (required to view it in Cumulocity)
-    Execute Command    cmd=tedge mqtt pub -r te/device/main///twin/AutoUpdater '{"enabled":true,"interval":"weekly"}'
+    # Check the initial state (which is sent by the tedge-inventory-plugin)
+    Cumulocity.Managed Object Should Have Fragment Values    AutoUpdater.enabled\=false    AutoUpdater.interval\="weekly"
 
     ${operation}=    Cumulocity.Create Operation
     ...    description=Set auto updater parameters
-    ...    fragments={"c8y_ParameterUpdate":{},"c8y_ParameterUpdate_AutoUpdater":{},"AutoUpdater":{"enabled":false,"interval":"hourly"}}
+    ...    fragments={"c8y_ParameterUpdate":{},"c8y_ParameterUpdate_AutoUpdater":{},"AutoUpdater":{"enabled":true,"interval":"hourly"}}
     Cumulocity.Operation Should Be SUCCESSFUL    ${operation}
-    Cumulocity.Managed Object Should Have Fragment Values    AutoUpdater.enabled\=false    AutoUpdater.interval\="hourly"
+    Cumulocity.Managed Object Should Have Fragment Values    AutoUpdater.enabled\=true    AutoUpdater.interval\="hourly"
 
 
 *** Keywords ***

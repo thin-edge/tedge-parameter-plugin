@@ -18,6 +18,7 @@ provides:
 
 depends:
   - jq
+  - tedge-inventory
 
 apk:
   # Use noarch instead of "all"
@@ -27,6 +28,11 @@ contents:
     dst: /etc/tedge/operations/
     file_info:
       mode: 0644
+
+  - src: ./src/inventory-scripts/60_AutoUpdater
+    dst: /usr/share/tedge-inventory/scripts.d/
+    file_info:
+      mode: 0755
 
   - src: ./src/c8y_ParameterUpdate.template
     dst: /etc/tedge/operations/c8y/
