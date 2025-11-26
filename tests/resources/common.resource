@@ -8,4 +8,4 @@ Library    Cumulocity
 
 # Docker adapter settings (to control which image is used in the system tests).
 # The user just needs to set the IMAGE env variable
-&{DOCKER_CONFIG}    image=%{IMAGE= }
+&{DOCKER_CONFIG}    image=%{IMAGE=debian-12}
