@@ -4,6 +4,35 @@
 
 thin-edge.io plugin to add support for the Cumulocity `c8y_ParameterUpdate` operation.
 
+## Pre-requisites
+
+The Cumulocity device parameter feature has a few dependencies which need to be enabled/configured before you can install this plugin.
+
+* Microservices
+  * dtm
+  * device-parameter
+
+* feature flags
+  * `dtm.asset-api`
+
+    ```sh
+    c8y features enable --key dtm.asset-api
+    ```
+
+    Note: It can take a few minutes before the DTM microservice registers the API.
+
+* User permissions
+  * ROLE_DIGITAL_TWIN_DEFINITIONS_CREATE
+  * ROLE_DIGITAL_TWIN_DEFINITIONS_ADMIN
+
+  You can assign these to one of the groups using the following commands:
+
+  ```sh
+  c8y userroles addRoleToGroup --role ROLE_DIGITAL_TWIN_DEFINITIONS_CREATE --group admins
+  c8y userroles addRoleToGroup --role ROLE_DIGITAL_TWIN_DEFINITIONS_ADMIN --group admins
+  ```
+
+
 ## Plugin summary
 
 ### What will be deployed to the device?
@@ -72,27 +101,32 @@ An additional parameter set plugins should be added in the following script:
 Create a new property identifier using the following command. This is required before the UI will be able to display the different parameter sets.
 
 ```sh
-c8y api POST /service/dtm/definitions/properties --template '{
+c8y api --raw POST /service/dtm/definitions/properties --template '{
   "identifier": "AutoUpdater",
   "jsonSchema": {
-    "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Auto Updater",
     "description": "Auto update configuration to keep your device up to date with the latest software",
-    "type": "object",
     "properties": {
       "enabled": {
-        "type": "boolean"
+        "type": "boolean",
+        "default": null,
+        "title": "enabled",
+        "order": 1
       },
       "interval": {
-        "type": "string"
+        "type": "string",
+        "title": "interval",
+        "enum": ["hourly", "daily", "weekly"],
+        "order": 2
       }
-    }
+    },
+    "type": "object"
   },
-  "tags": [
-    "thin-edge.io"
-  ],
-  "contexts": ["event", "asset"],
-  "additionalProp1": {}
+  "contexts": [
+    "asset",
+    "event",
+    "operation"
+  ]
 }
 '
 ```
@@ -102,7 +136,7 @@ c8y api POST /service/dtm/definitions/properties --template '{
 If you need to delete an existing property identifier use the following command:
 
 ```sh
-c8y api DELETE "/service/dtm/definitions/properties/AutoUpdater?contexts=asset,event"
+c8y api DELETE "/service/dtm/definitions/properties/AutoUpdater?contexts=asset,event,operation"
 ```
 
 #### Update a property identifier
@@ -110,7 +144,7 @@ c8y api DELETE "/service/dtm/definitions/properties/AutoUpdater?contexts=asset,e
 **Note** The following command fails. Maybe not all fields can be updated.
 
 ```sh
-c8y api PUT "/service/dtm/definitions/properties/AutoUpdater?contexts=event,asset" --template '{
+c8y api --raw PUT "/service/dtm/definitions/properties/AutoUpdater?contexts=event,asset,operation" --template '{
   "identifier": "AutoUpdater",
   "jsonSchema": {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -119,19 +153,23 @@ c8y api PUT "/service/dtm/definitions/properties/AutoUpdater?contexts=event,asse
     "type": "object",
     "properties": {
       "enabled": {
-        "type": "boolean"
+        "type": "boolean",
+        "default": null,
+        "title": "enabled",
+        "order": 1
       },
       "interval": {
         "type": "string",
-        "enum": ["hourly", "daily", "weekly"]
+        "title": "interval",
+        "enum": ["hourly", "daily", "weekly"],
+        "order": 2
       }
     }
   },
   "tags": [
     "thin-edge.io"
   ],
-  "contexts": ["event", "asset"],
-  "additionalProp1": {}
+  "contexts": ["event", "asset", "operation"]
 }
 '
 ```
