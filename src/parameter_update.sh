@@ -46,7 +46,7 @@ case "$COMMAND" in
             exit 1
         fi
 
-        PARAMETER_PAYLOAD=$(echo "$MESSAGE" | jq ".operation.${TYPE}")
+        PARAMETER_PAYLOAD=$(echo "$MESSAGE" | jq ".operation.\"${TYPE}\"")
 
         echo :::begin-tedge:::
         printf '{"type":"%s","parameters":%s}\n' "$TYPE" "$PARAMETER_PAYLOAD"
