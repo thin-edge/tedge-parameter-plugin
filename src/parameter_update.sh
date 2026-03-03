@@ -17,12 +17,24 @@ set_parameters() {
     TYPE="$1"
     PARAMETERS="$2"
 
-    if [ ! -x "$PARAMETER_PLUGINS/$TYPE" ]; then
-        echo "Could not find a matching parameter plugin. path=$PARAMETER_PLUGINS/$TYPE" >&2
+    case "$TYPE" in
+        flow_params_*)
+            # Special case where a single parameter plugin is responsible for managing all flow parameters
+            # since flows can't write the values to file themselves
+            COMMON_TYPE=flow_params
+            ;;
+        *)
+            COMMON_TYPE="$TYPE"
+            ;;
+    esac
+
+    if [ ! -x "$PARAMETER_PLUGINS/$COMMON_TYPE" ]; then
+        echo "Could not find a matching parameter plugin. path=$PARAMETER_PLUGINS/$COMMON_TYPE" >&2
         exit 1
     fi
 
-    "$PARAMETER_PLUGINS/$TYPE" set "$PARAMETERS"
+    echo "Running plugin: \"$PARAMETER_PLUGINS/$COMMON_TYPE\" set \"$PARAMETERS\" \"$TYPE\"" >&2
+    "$PARAMETER_PLUGINS/$COMMON_TYPE" set "$PARAMETERS" "$TYPE"
 }
 
 case "$COMMAND" in

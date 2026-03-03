@@ -1,0 +1,47 @@
+#!/bin/sh
+set -e
+COMMAND="$1"
+shift
+
+TEDGE_CONFIG_DIR="${TEDGE_CONFIG_DIR:-/etc/tedge}"
+
+update_parameters() {
+    MESSAGE="$1"
+    MESSAGE_TYPE="$2"
+
+    # Write to the params.
+    MAPPER=$(echo "$MESSAGE_TYPE" | cut -d_ -f3)
+    NAME=$(echo "$MESSAGE_TYPE" | cut -d_ -f4-)
+
+    FLOW_DIR="$TEDGE_CONFIG_DIR/mappers/$MAPPER/flows/$NAME"
+    if [ ! -d "$FLOW_DIR" ]; then
+        echo "Flow directory does not exist. path=$FLOW_DIR" >&2
+        exit 1
+    fi
+
+    # convert json to key/value and write it to the params.toml file
+    echo "Writing to the flows params.toml file. path=$FLOW_DIR/params.toml" >&2
+    echo "$MESSAGE" | jq -r 'to_entries|map("\(.key) = \(.value|tojson)")|.[]' | sudo tedge-write "$FLOW_DIR/params.toml"
+
+    # Note: manually update the digital twin property though normally this is done by the Device Parameter microservice
+    # as sending the 408 message is actually harder than just updating the digital twin value
+    tedge mqtt pub -r "te/device/main///twin/$MESSAGE_TYPE" "${MESSAGE}"
+}
+
+get() {
+    echo "{}"
+}
+
+case "$COMMAND" in
+    init)
+        ;;
+    set)
+        update_parameters "$@"
+        ;;
+    get)
+        ;;
+    *)
+        echo "Unknown command. name=$COMMAND" >&2
+        exit 1
+        ;;
+esac

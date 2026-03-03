@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+# NOTE: The flow should probably be in charge of publishing its own values rather than relying on this mechanism to get and update the values
+# in the cloud
+
+TEDGE_CONFIG_DIR=${TEDGE_CONFIG_DIR:-/etc/tedge}
+MAPPERS_DIR="$TEDGE_CONFIG_DIR/mappers"
+
+find "$MAPPERS_DIR" -name params.toml | while read -r PARAMS_FILE; do
+    VALUES=$(jq --raw-input '[ inputs
+  | gsub("\r$"; "")
+  | split(" = "; "")
+  | select(length == 2)
+  | {(.[0]): (.[1] | fromjson)}
+] | add' "$PARAMS_FILE")
+
+    FLOW_DIR_RELATIVE=$(dirname "${PARAMS_FILE#"$MAPPERS_DIR"/}")
+    MAPPER=$(echo "$FLOW_DIR_RELATIVE" | cut -d/ -f1)
+    NAME=$(echo "$FLOW_DIR_RELATIVE" | cut -d/ -f3-)
+    if [ -n "$NAME" ]; then
+        tedge mqtt pub --retain "te/device/main///twin/flow_params_${MAPPER}_$NAME" "$VALUES"
+    fi
+done

@@ -37,6 +37,11 @@ contents:
     file_info:
       mode: 0755
 
+  - src: ./src/inventory-scripts/70_FlowParams
+    dst: /usr/share/tedge-inventory/scripts.d/
+    file_info:
+      mode: 0755
+
   - src: ./src/c8y_ParameterUpdate.template
     dst: /etc/tedge/operations/c8y/
     file_info:
