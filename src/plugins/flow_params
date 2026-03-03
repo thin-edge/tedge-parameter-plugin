@@ -21,11 +21,14 @@ update_parameters() {
 
     # convert json to key/value and write it to the params.toml file
     echo "Writing to the flows params.toml file. path=$FLOW_DIR/params.toml" >&2
-    echo "$MESSAGE" | jq -r 'to_entries|map("\(.key) = \(.value|tojson)")|.[]' | sudo tedge-write "$FLOW_DIR/params.toml"
+    CONTENTS=$(echo "$MESSAGE" | jq -r 'to_entries|map("\(.key) = \(.value|tojson)")|.[]')
+    if [ -n "$CONTENTS" ] && [ "$CONTENTS" != "null" ]; then
+        echo "$MESSAGE" | jq -r 'to_entries|map("\(.key) = \(.value|tojson)")|.[]' | sudo tedge-write "$FLOW_DIR/params.toml"
 
-    # Note: manually update the digital twin property though normally this is done by the Device Parameter microservice
-    # as sending the 408 message is actually harder than just updating the digital twin value
-    tedge mqtt pub -r "te/device/main///twin/$MESSAGE_TYPE" "${MESSAGE}"
+        # Note: manually update the digital twin property though normally this is done by the Device Parameter microservice
+        # as sending the 408 message is actually harder than just updating the digital twin value
+        tedge mqtt pub -r "te/device/main///twin/$MESSAGE_TYPE" "${MESSAGE}"
+    fi
 }
 
 get() {
