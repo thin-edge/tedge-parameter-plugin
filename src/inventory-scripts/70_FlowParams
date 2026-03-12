@@ -7,18 +7,38 @@ set -e
 TEDGE_CONFIG_DIR=${TEDGE_CONFIG_DIR:-/etc/tedge}
 MAPPERS_DIR="$TEDGE_CONFIG_DIR/mappers"
 
-find "$MAPPERS_DIR" -name params.toml | while read -r PARAMS_FILE; do
+# find both the params.toml and params.toml.template files, but only
+# process the template if the params.toml doesn't exist
+find "$MAPPERS_DIR" -name "params.toml*" | while read -r PARAMS_FILE; do
+    DIR_NAME=$(dirname "$PARAMS_FILE")
+    case "$PARAMS_FILE" in
+        */params.toml)
+            ;;
+        */params.toml.template)
+            # ignore the template file when there is already a params.toml file
+            if [ -f "$DIR_NAME/params.toml" ]; then
+                continue
+            fi
+            ;;
+    esac
+
     VALUES=$(jq --raw-input --null-input '[ inputs
   | gsub("\r$"; "")
+  | select(length > 0 and (startswith("#") | not))
   | split(" = "; "")
   | select(length == 2)
   | {(.[0]): (.[1] | fromjson)}
-] | add' "$PARAMS_FILE")
+] | add' "$PARAMS_FILE" || true)
+
+    if [ -z "$VALUES" ]; then
+        continue
+    fi
 
     FLOW_DIR_RELATIVE=$(dirname "${PARAMS_FILE#"$MAPPERS_DIR"/}")
     MAPPER=$(echo "$FLOW_DIR_RELATIVE" | cut -d/ -f1)
     NAME=$(echo "$FLOW_DIR_RELATIVE" | cut -d/ -f3-)
     if [ -n "$NAME" ]; then
+        echo "Publishing twin data: topic=te/device/main///twin/flow_params_${MAPPER}_$NAME, message=$VALUES" >&2
         tedge mqtt pub --retain "te/device/main///twin/flow_params_${MAPPER}_$NAME" "$VALUES"
     fi
 done
