@@ -1,25 +1,18 @@
 # tedge-parameter-plugin
 
-⚠️ This is a work-in-progress so expect things to break and the Cumulocity feature is still in development
+thin-edge.io plugin to add support for the Cumulocity [Parameters (c8y_ParameterUpdate)](https://cumulocity.com/docs/device-management-application/managing-device-parameters/) feature.
 
-thin-edge.io plugin to add support for the Cumulocity `c8y_ParameterUpdate` operation.
+Check out the official [Cumulocity docs](https://cumulocity.com/docs/device-management-application/managing-device-parameters/) for more information.
 
 ## Pre-requisites
 
 The Cumulocity device parameter feature has a few dependencies which need to be enabled/configured before you can install this plugin.
 
+**Note:** You may need to create a Cumulocity support ticket to request access to the following microservices before you can use this thin-edge.io plugin.
+
 * Microservices
-  * dtm
+  * dtm - [Digital Twin Manager](https://cumulocity.com/docs/dtm/dtm-introduction/)
   * device-parameter
-
-* feature flags
-  * `dtm.asset-api`
-
-    ```sh
-    c8y features enable --key dtm.asset-api
-    ```
-
-    Note: It can take a few minutes before the DTM microservice registers the API.
 
 * User permissions
   * ROLE_DIGITAL_TWIN_DEFINITIONS_CREATE
@@ -41,6 +34,7 @@ The Cumulocity device parameter feature has a few dependencies which need to be 
 * Cumulocity command template for mapping the c8y_ParameterUpdate operation to the `parameter_update` thin-edge.io command
 * parameter_set.sh binary used to provide the parameter_update plugin system
 * An example [AutoUpdater](./src/plugins/AutoUpdater) parameter set script. This is only an example and can be used as a reference
+* An example flows parameter set script used to allow users to control values in flows' params.toml file
 
 **Technical summary**
 
@@ -109,7 +103,7 @@ c8y api --raw POST /service/dtm/definitions/properties --template '{
     "properties": {
       "enabled": {
         "type": "boolean",
-        "default": null,
+        "default": false,
         "title": "enabled",
         "order": 1
       },
