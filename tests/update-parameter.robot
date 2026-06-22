@@ -1,10 +1,8 @@
 *** Settings ***
 Resource    ./resources/common.resource
-Library    Cumulocity
-Library    DeviceLibrary    bootstrap_script=bootstrap.sh
 
-Suite Setup    Test Setup
-Suite Teardown    Collect Logs
+Test Setup       Setup Device
+Test Teardown    Teardown Device
 
 *** Test Cases ***
 
@@ -25,21 +23,3 @@ Run Parameter Update handler as a plugin
     ...    fragments={"c8y_ParameterUpdate":{},"c8y_ParameterUpdate_AutoUpdater":{},"AutoUpdater":{"enabled":true,"interval":"hourly"}}
     Cumulocity.Operation Should Be SUCCESSFUL    ${operation}
     Cumulocity.Managed Object Should Have Fragment Values    AutoUpdater.enabled\=true    AutoUpdater.interval\="hourly"
-
-
-*** Keywords ***
-
-Test Setup
-    ${DEVICE_SN}=    Setup
-    Set Suite Variable    $DEVICE_SN
-    Device Should Exist    ${DEVICE_SN}
-
-Collect Logs
-    Get Workflow Logs
-    Get Service Logs
-
-Get Workflow Logs
-    DeviceLibrary.Execute Command    head -n-0 /var/log/tedge/agent/*
-
-Get Service Logs
-    DeviceLibrary.Execute Command    journalctl --no-pager
