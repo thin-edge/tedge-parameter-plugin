@@ -19,5 +19,6 @@ venv:
 test *args='':
   ./.venv/bin/python3 -m robot.run --outputdir output {{args}} tests
 
-build-test: build
-  docker buildx build -t {{IMAGE}} --load -f ./test-images/{{IMAGE}}/Dockerfile .
+# Build the test image from the already-built packages in dist/
+build-test:
+  docker buildx build -t {{IMAGE}} --load -f ./test-images/{{IMAGE}}/dockerfile .
