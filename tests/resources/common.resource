@@ -39,7 +39,7 @@ Get Workflow Logs
 
 Get Service Logs
     # systemd image: collect from the journal rather than on-disk log files
-    DeviceLibrary.Execute Command    cmd=journalctl -n 10000 -u "tedge-*" -u "c8y-*" --no-pager
+    DeviceLibrary.Execute Command    cmd=journalctl -n 10000 -u "tedge-*" -u "c8y-*" -u mosquitto --no-pager
 
 Teardown Device
     Collect Logs
